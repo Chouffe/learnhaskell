@@ -1,0 +1,18 @@
+(.) :: (b -> c) -> (a -> b) -> a -> c
+fmap :: Functor f => (m -> n) -> f m -> f n
+fmap :: Functor g => (x -> y) -> g x -> g y
+fmap . fmap :: (Functor f, Functor g) => (a -> b) -> f (g a) -> f (g b)
+fmap . fmap :: (Functor f, Functor g) => (b -> c) :: (m -> n) -> (f m -> f n)
+                                                b :: (m -> n)
+                                                c :: f m -> f n
+                                         (a -> b) :: (x -> y) -> g x -> g y
+                                                a :: x -> y
+                                                b :: g x -> g y
+                                         (a -> c) :: (x -> y) -> f m -> f n
+                                         (m -> n) :: g x -> g y
+                                              g x :: m
+                                              g y :: n
+                                         (a -> c) :: (x -> y) -> f (g x) -> f (g y)
+                                      fmap . fmap :: (x -> y) -> f (g x) -> f (g y)
+
+

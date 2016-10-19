@@ -1,0 +1,1 @@
+sayHello	test.hs	/^sayHello x = putStrLn ("Hello " ++ x ++ "!")$/;"	v
