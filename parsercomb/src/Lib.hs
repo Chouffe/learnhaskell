@@ -1,7 +1,7 @@
 module Lib where
 
 import Text.Trifecta
-import Text.Parser.Combinators (eof)
+import Text.Parser.Combinators (eof, choice)
 import Control.Applicative
 
 someFunc :: IO ()
@@ -30,6 +30,17 @@ onetwothree = do
 
 one' :: Parser a
 one' = one >> stop
+
+onetwothreeOronetwoOrone :: Parser String
+-- onetwothreeOronetwoOrone = choice [ string "123"
+--                                   , string "12"
+--                                   , string "1"
+--                                   ]
+
+onetwothreeOronetwoOrone = choice [p3, p2, p1]
+  where p1 = char '1' >> char '2' >> char '3' >> eof >> return "123"
+        p2 = char '1' >> char '2' >> eof >> return "12"
+        p3 = char '1' >> eof >> return "1"
 
 testParse :: Parser Char -> IO ()
 testParse p =
