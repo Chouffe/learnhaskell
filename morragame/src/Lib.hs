@@ -9,42 +9,30 @@ import Data.Maybe (fromMaybe)
 import Data.List (unlines)
 import System.Random
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
-
+-- ADTs and models
 type PlayerScore = Integer
-type ComputerScore = Integer
-data Score = Score PlayerScore ComputerScore deriving (Eq, Show)
+data Score = Score PlayerScore PlayerScore deriving (Eq, Show)
+data Mode = Odds | Evens deriving (Eq, Show)
+data Player = Computer Mode | Human Mode deriving (Eq, Show)
+type Fingers = Integer
 
 instance Monoid Score where
   mempty = Score 0 0
   mappend (Score x1 y1) (Score x2 y2) = Score (x1 + x2) (y1 + y2)
 
--- TODO: Monoid instance for Score
-
-data Mode = Odds | Evens deriving (Eq, Show)
-data Player = Computer Mode | Human Mode deriving (Eq, Show)
-
-type Game a = StateT Score IO a
-type Fingers = Integer
-
--- Error Handling
+-- TODO: Error Handling
 check :: Integer -> Either String Integer
 check x
   | x > 2 || x <= 0 = Left "Value should be 0 < x <= 2"
   | otherwise = Right x
 
-play :: Integer -> Integer -> Score -> Score
-play p1 p2 (Score psc csc)
-  | even s = Score psc (csc + 1)
-  | odd s = Score (psc + 1) csc
-  where s = p1 + p2
-
 -- TODO: deal with errors in an either type
-winner :: (Player, Fingers) -> (Player, Fingers) -> Score
+winner :: (Player, Fingers)
+       -> (Player, Fingers)
+       -> Score
 winner ((Human Odds), h) ((Computer Evens), c) =
   if odd (h + c)
-  then Score 1 0
+     then Score 1 0 -- TODO: refactor logic
   else Score 0 1
 winner ((Human Odds), h) ((Human Evens), c) =
   if odd (h + c)
@@ -56,7 +44,10 @@ winner ((Human Evens), h) ((Computer Odds), c) =
   else Score 0 1
 winner _ _ = undefined
 
-winnerShow :: (Player, Fingers) -> (Player, Fingers) -> String
+-- TODO: refactor logic
+winnerShow :: (Player, Fingers)
+           -> (Player, Fingers)
+           -> String
 winnerShow ((Human Odds), h) ((Computer Evens), c) =
   if odd (h + c)
   then "Player Human wins"
@@ -65,12 +56,14 @@ winnerShow ((Human Odds), h) ((Human Evens), c) =
   if odd (h + c)
   then "Player Human 1 wins"
   else "Player Human 2 wins"
+winnerShow _ _ = undefined -- TODO
 
 drawRandom :: RandomGen g => g -> IO (Integer, g)
 drawRandom g = randomRIO (0, 1) >>= \x -> return $ (mod x 2, g)
 
-drawHuman :: RandomGen g => g -> IO (Integer, g)
-drawHuman g = fmap ((\x -> (x,g)) . (flip mod 2) . read) getLine
+-- TODO: add error handling and retries
+drawHuman :: IO Integer
+drawHuman = fmap ((flip mod 2) . read) getLine
 
 introPlayer :: Integer ->  Player -> String
 introPlayer x (Human Odds) = "Human " ++ show x ++ " is odds"
@@ -79,7 +72,7 @@ introPlayer x (Computer Odds) = "Computer" ++ show x ++ " is odds"
 introPlayer x (Computer Evens) = "Computer" ++ show x ++ " is evens"
 
 intro :: [Player] -> String
-intro players = let labelPlayer = "-- P is Player"
+intro players = let labelPlayer   = "-- P is Player"
                     labelComputer = "-- C is Computer"
                     intros = zipWith introPlayer [0..] players
                  in unlines (labelPlayer:labelComputer:intros)
@@ -92,18 +85,21 @@ playerShoot g (Computer _) = do
   return (x, g1)
 playerShoot g (Human _) = do
   putStr "P: "
-  drawHuman g
+  x <- drawHuman
+  return (x, g)
 
-gameLoop :: (RandomGen g) => g -> Player -> Player -> Score -> IO ()
+gameLoop :: (RandomGen g) => g
+         -> Player
+         -> Player
+         -> Score
+         -> IO ()
 gameLoop g p1 p2 score = do
-  (fingersP1, _) <- playerShoot g p1
+  (fingersP1, g1) <- playerShoot g p1
   (fingersP2, g2) <- playerShoot g p2
-  putStrLn $ "FingersP1: " ++ show fingersP1
-  putStrLn $ "FingersP2: " ++ show fingersP2
   let score' = winner (p1, fingersP1) (p2, fingersP2)
       newScore = mappend score score'
-  putStrLn $ "Score: " ++ show newScore
   putStrLn $ winnerShow (p1, fingersP1) (p2, fingersP2)
+  putStrLn $ "Score: " ++ show newScore
   gameLoop g2 p1 p2 newScore
 
 main :: IO ()
@@ -114,3 +110,10 @@ main =
      g <- getStdGen
      putStr $ intro players
      gameLoop g human computer mempty
+
+-- TODO:
+----------------------------------------------------
+-- add final score when breaks out of gameLoop
+-- add error handling for incorrect inputs
+-- add a StateT version and compare the differences
+-- add tests with quickcheck and hspec
