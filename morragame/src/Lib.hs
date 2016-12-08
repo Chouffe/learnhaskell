@@ -20,7 +20,6 @@ instance Monoid Score where
   mempty = Score 0 0
   mappend (Score x1 y1) (Score x2 y2) = Score (x1 + x2) (y1 + y2)
 
--- TODO: Error Handling
 check :: Integer -> Either String Integer
 check x
   | x > 2 || x <= 0 = Left "Value should be 0 < x <= 2"
@@ -62,8 +61,19 @@ drawRandom :: RandomGen g => g -> IO (Integer, g)
 drawRandom g = randomRIO (0, 1) >>= \x -> return $ (mod x 2, g)
 
 -- TODO: add error handling and retries
+getLineInteger :: IO Integer
+getLineInteger = do
+  l <- getLine
+  case (reads l :: [(Integer, String)]) of
+    [] -> putStrLn "Please enter an Integer.." >> getLineInteger
+    [(x, _)] -> return x
+
 drawHuman :: IO Integer
-drawHuman = fmap ((flip mod 2) . read) getLine
+drawHuman = do
+  x <- getLineInteger
+  case check x of
+    Right x -> return x
+    Left e -> putStrLn e >> drawHuman
 
 introPlayer :: Integer ->  Player -> String
 introPlayer x (Human Odds) = "Human " ++ show x ++ " is odds"
@@ -111,9 +121,29 @@ main =
      putStr $ intro players
      gameLoop g human computer mempty
 
+gameLoop2 :: Player
+          -> Player
+          -> StateT Score IO ()
+gameLoop2 p1 p2 = do
+  g <- liftIO getStdGen
+  (fingersP1, g1) <- liftIO $ playerShoot g p1
+  (fingersP2, g2) <- liftIO $ playerShoot g p2
+  let score' = winner (p1, fingersP1) (p2, fingersP2)
+  newScore <- fmap (mappend score') get
+  liftIO $ putStrLn $ winnerShow (p1, fingersP1) (p2, fingersP2)
+  liftIO $ putStrLn $ "Score: " ++ show newScore
+  put newScore
+  gameLoop2 p1 p2
+
+main2 :: IO ()
+main2 =
+  let players = [Human Odds, Computer Evens] -- import System.Random
+      [human, computer] = players
+   in do
+     putStr $ intro players
+     runStateT (gameLoop2 human computer) mempty
+     return ()
+
 -- TODO:
 ----------------------------------------------------
--- add final score when breaks out of gameLoop
--- add error handling for incorrect inputs
--- add a StateT version and compare the differences
 -- add tests with quickcheck and hspec
