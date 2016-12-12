@@ -41,6 +41,15 @@ parseFraction = do
     0 -> fail "Denominator cannot be zero"
     _ -> return (numerator % denominator)
 
+toInt :: [Integer] -> Integer
+toInt = sum . zipWith (\k x -> x * 10 ^ k) [0..] . reverse
+
+parseDigits :: Parser Integer
+parseDigits = do
+  digits <- some integer
+  eof
+  return $ toInt digits
+
 main :: IO ()
 main = do
   print $ parseString parseFraction mempty shouldWork
