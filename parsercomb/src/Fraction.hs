@@ -32,7 +32,7 @@ float = do
   p <- many decimal
   char '.'
   q <- many decimal
-  return $ (fromIntegral (toInt p)) + (fromIntegral (toInt q)) * 1.0 / (10.0 ^ (fromIntegral (1 + length q)))
+  return $ fromIntegral (toInt p) + fromIntegral (toInt q) * 1.0 / 10.0 ^ fromIntegral (1 + length q)
 
 fractionOrFloat :: Parser FractionOrFloat
 fractionOrFloat = try
@@ -40,5 +40,4 @@ fractionOrFloat = try
   <|> (Right <$> float)
 
 output:: IO ()
-output = do
-  print $ parseString fraction mempty shouldWork
+output = print $ parseString fraction mempty shouldWork

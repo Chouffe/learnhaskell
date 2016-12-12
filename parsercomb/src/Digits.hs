@@ -48,4 +48,4 @@ base10Integer = do
                  ys -> let result = toNum ys
                         in case signum of
                              '-' -> return $ - result
-                             _ -> return result
+                             l_ -> return result

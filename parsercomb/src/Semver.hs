@@ -32,7 +32,7 @@ instance Ord SemVer where
 
 numberOrString :: Parser NumberOrString
 numberOrString =
-      NOSS <$> (some letter)
+      NOSS <$> some letter
   <|> NOSI <$> integer
 
 release :: Parser Release

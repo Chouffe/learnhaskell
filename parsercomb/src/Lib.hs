@@ -24,9 +24,7 @@ onetwothree = do
   o <- one
   t <- two
   tt <- three
-  return $ [o, t, tt]
-
-
+  return [o, t, tt]
 
 one' :: Parser a
 one' = one >> stop
