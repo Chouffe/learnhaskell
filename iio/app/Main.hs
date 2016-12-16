@@ -28,9 +28,13 @@ version = "Version 1.0.0"
 main :: IO ()
 main = do
   mode <- fmap getMode getArgs
+  notTimeout <- hWaitForInput stdin 3000
   s <- fmap removeNonLetters getContents
-  case mode of
-    Nothing -> hPutStr stderr usage
-    Just Decrypt -> hPutStr stdout $ unVigenere key s
-    Just Encrypt -> hPutStr stdout $ vigenere key s
+  if notTimeout
+  then exitWith (ExitFailure 1)
+  else
+    case mode of
+      Nothing -> hPutStr stderr usage
+      Just Decrypt -> hPutStr stdout $ unVigenere key s
+      Just Encrypt -> hPutStr stdout $ vigenere key s
   where key = "mykey"
