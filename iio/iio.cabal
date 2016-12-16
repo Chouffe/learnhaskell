@@ -10,17 +10,25 @@ maintainer:          example@example.com
 copyright:           2016 Author name here
 category:            Web
 build-type:          Simple
-extra-source-files:  README.md
 cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
   exposed-modules:     Lib
                      , Vigenere
+                     , Ini
   build-depends:       base >= 4.7 && < 5
+                     , bytestring
+                     , containers
+                     , directory
                      , ghc-prim
-                     , time
+                     , hspec
                      , random
+                     , raw-strings-qq
+                     , split
+                     , text
+                     , time
+                     , trifecta
   default-language:    Haskell2010
 
 executable iio-exe
