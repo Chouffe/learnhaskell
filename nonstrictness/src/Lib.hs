@@ -5,7 +5,7 @@ module Lib where
 import Debug.Trace
 
 someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+someFunc = putStrLn "someFunc3"
 
 mfoldr k z [] =  z
 mfoldr k z (x:xs) = k x $ mfoldr k z xs
