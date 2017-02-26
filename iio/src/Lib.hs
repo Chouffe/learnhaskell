@@ -1,14 +1,14 @@
 module Lib where
 
-import GHC.Prim
-import GHC.Types
-import Control.Concurrent
-import Data.Time.Clock
-import Data.Time.Calendar
-import Debug.Trace (trace)
-import Control.Monad (join, replicateM)
-import System.Random (randomIO, randomRIO)
-import System.IO.Unsafe (unsafePerformIO)
+import           Control.Concurrent
+import           Control.Monad      (join, replicateM)
+import           Data.Time.Calendar
+import           Data.Time.Clock
+import           Debug.Trace        (trace)
+import           GHC.Prim
+import           GHC.Types
+import           System.IO.Unsafe   (unsafePerformIO)
+import           System.Random      (randomIO, randomRIO)
 
 newtype State s a
   = State { runState :: s -> (s, a) }
@@ -75,7 +75,7 @@ ioSharingPlayground = do
 
 gimmeShelter :: Bool -> IO [Int]
 gimmeShelter False = pure [0]
-gimmeShelter True = replicateM 10 (randomRIO (0, 10))
+gimmeShelter True  = replicateM 10 (randomRIO (0, 10))
 
 -- Functor, Applicative, Monad
 -- fmap :: (a -> b) -> IO a -> IO b

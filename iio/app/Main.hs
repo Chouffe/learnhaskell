@@ -1,18 +1,21 @@
 module Main where
 
-import Lib
-import Ini (ini, Config)
-import Control.Monad (mapM)
-import Vigenere (vigenere, unVigenere)
-import System.IO (IOMode(ReadMode), getContents, hGetChar, hGetContents, hPutStr, hWaitForInput, openFile, stderr, stdin, stdout)
-import System.Environment (getArgs)
-import Data.List.Split (splitOn)
-import Data.Char (isLetter)
-import qualified Data.Map.Strict as M
-import System.Exit (exitSuccess, ExitCode(ExitFailure, ExitSuccess), exitWith)
-import System.Directory (getDirectoryContents)
-import Text.Trifecta
-import Text.Trifecta.Result
+import           Control.Monad        (mapM)
+import           Data.Char            (isLetter)
+import           Data.List.Split      (splitOn)
+import qualified Data.Map.Strict      as M
+import           Ini                  (Config, ini)
+import           Lib
+import           System.Directory     (getDirectoryContents)
+import           System.Environment   (getArgs)
+import           System.Exit          (ExitCode (ExitFailure, ExitSuccess),
+                                       exitSuccess, exitWith)
+import           System.IO            (IOMode (ReadMode), getContents, hGetChar,
+                                       hGetContents, hPutStr, hWaitForInput,
+                                       openFile, stderr, stdin, stdout)
+import           Text.Trifecta
+import           Text.Trifecta.Result
+import           Vigenere             (unVigenere, vigenere)
 
 -- Vigenere command Line
 
@@ -42,7 +45,7 @@ main = do
   then exitWith (ExitFailure 1)
   else
     case mode of
-      Nothing -> hPutStr stderr usage
+      Nothing      -> hPutStr stderr usage
       Just Decrypt -> hPutStr stdout $ unVigenere key s
       Just Encrypt -> hPutStr stdout $ vigenere key s
   where key = "mykey"
@@ -56,7 +59,7 @@ iniFile fp =
   case splitOn "." fp of
     []  -> False
     [x] -> False
-    xs -> last xs == "ini"
+    xs  -> last xs == "ini"
 
 configMap :: [FilePath] -> [String] -> M.Map FilePath (Text.Trifecta.Result.Result Ini.Config)
 configMap fps xs = M.fromList $ zip fps parsedContents
