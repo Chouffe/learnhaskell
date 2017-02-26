@@ -1,6 +1,7 @@
 module Main where
 
 import Data.List (intercalate)
+import Data.Function (fix)
 
 msum :: (Eq a, Num a) => a -> a
 msum 0 = 0
@@ -40,3 +41,19 @@ digits n
 
 wordNumber :: Int -> String
 wordNumber = intercalate "-" . map digitToWord . digits
+
+factorial :: Int -> Int
+factorial = fix (\f -> \n -> if n <= 1 then n else n * f (n - 1))
+
+fib :: Int -> Int
+fib = fix (\f -> \n -> if n < 2 then n else f (n - 1) + f (n - 2))
+
+digits' :: Int -> [Int]
+digits' =
+  fix $ \f n ->
+        if n < 10 then [n]
+        else
+          let (d, m) = divMod n 10
+          in (f d) ++ [m]
+
+-- >>> take 10 (fix (1:)) :: [Int]
