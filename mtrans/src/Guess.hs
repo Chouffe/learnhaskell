@@ -58,7 +58,6 @@ guessSession2 = do
       lift $ modify (+1)
       guessSession2
     EQ -> liftIO $ putStrLn "Got it!"
-
 game2 :: IO ()
 game2 = do
   answer <- randomRIO ((1,100) :: (Integer, Integer))
